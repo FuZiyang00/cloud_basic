@@ -15,10 +15,6 @@ class NextcloudUser(HttpUser):
         self.auth = HTTPBasicAuth(self.user_name, 'ziyang1234!')
 
         # Generate files
-        self.file_1gb = "./data/file_1gb"
-        with open(self.file_1gb, "wb") as file:
-            file.write(os.urandom(1024 * 1024 * 1024))  # 1GB
-
         self.file_1mb = "./test_data/file_1mb"
         if not os.path.exists(self.file_1mb):
             with open(self.file_1mb, "wb") as file:
@@ -28,6 +24,11 @@ class NextcloudUser(HttpUser):
         if not os.path.exists(self.file_1kb):
             with open(self.file_1kb, "wb") as file:
                 file.write(os.urandom(1024))  # 1KB
+
+        self.file_1gb = "./test_data/file_1gb"
+        if not os.path.exists(self.file_1mb):
+            with open(self.file_1gb, "wb") as file:
+                file.write(os.urandom(1024 * 1024 * 1024))  # 1GB
     
     @task(5)
     def propfind(self):
@@ -53,12 +54,12 @@ class NextcloudUser(HttpUser):
             response = self.client.put(remote_path, data=file, auth=self.auth)
         print(f"PUT 1KB status: {response.status_code}, content: {response.headers}")
 
-    @task(1)
-    def upload_file_1gb(self):
-        remote_path = f"/remote.php/dav/files/{self.user_name}/1gb_file_{random.randrange(0, 10)}"
-        with open(self.file_1gb, "rb") as file:
-            response = self.client.put(remote_path, data=file, auth=self.auth)
-        print(f"PUT 1GB status: {response.status_code}, content: {response.content}")
+    # @task(1)
+    # def upload_file_1gb(self):
+    #     remote_path = f"/remote.php/dav/files/{self.user_name}/1gb_file_{random.randrange(0, 10)}"
+    #     with open(self.file_1gb, "rb") as file:
+    #         response = self.client.put(remote_path, data=file, auth=self.auth)
+    #     print(f"PUT 1GB status: {response.status_code}, content: {response.content}")
     
     
     @task(1)
