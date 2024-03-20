@@ -1,0 +1,62 @@
+version: '3.8'
+
+volumes:
+  nextcloud1:
+  nextcloud2:
+  db:
+
+services:
+
+  db:
+    image: mysql:latest
+    restart: always
+    volumes:
+      - db:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: your-root-password
+      MYSQL_DATABASE: nextcloud
+      MYSQL_USER: nextcloud
+      MYSQL_PASSWORD: your-user-password
+
+  app1:
+    image: nextcloud
+    restart: always
+    container_name: nextcloud1
+    links:
+      - db
+    depends_on:
+      - db
+    environment:
+      MYSQL_HOST: db
+      MYSQL_DATABASE: nextcloud
+      MYSQL_USER: nextcloud
+      MYSQL_PASSWORD: your-user-password
+    volumes:
+      - nextcloud1:/var/www/html
+
+  app2:
+    image: nextcloud
+    restart: always
+    container_name: nextcloud2
+    links:
+      - db
+    depends_on:
+      - db
+    environment:
+      MYSQL_HOST: db
+      MYSQL_DATABASE: nextcloud
+      MYSQL_USER: nextcloud
+      MYSQL_PASSWORD: your-user-password
+    volumes:
+      - nextcloud2:/var/www/html
+
+  nginx:
+    image: nginx:latest
+    restart: always
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - 80:80
+    depends_on:
+      - app1
+      - app2

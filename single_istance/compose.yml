@@ -1,0 +1,38 @@
+version: '3.8'
+
+volumes:
+  nextcloud:
+  db:
+
+services:
+
+  db:
+    image: mysql:latest
+    restart: always
+    volumes:
+      - db:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: your-root-password
+      MYSQL_DATABASE: nextcloud
+      MYSQL_USER: nextcloud
+      MYSQL_PASSWORD: your-user-password
+
+  app:
+    image: nextcloud
+    restart: always
+    container_name: nextcloud
+    links:
+      - db
+    depends_on:
+      - db
+    environment:
+      MYSQL_HOST: db
+      MYSQL_DATABASE: nextcloud
+      MYSQL_USER: nextcloud
+      MYSQL_PASSWORD: your-user-password
+    volumes:
+      - nextcloud:/var/www/html
+    ports: 
+      - 8080:80
+    environment:                            
+      - ENABLE_NEXTCLOUD_MONITORING=true     # Enable the Monitoring app
